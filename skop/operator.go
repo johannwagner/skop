@@ -2,14 +2,17 @@ package skop
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"math"
+	"net/http"
 	"reflect"
 	"sync"
 	"time"
 
 	"github.com/ericchiang/k8s"
+	apiextensionsv1beta1 "github.com/ericchiang/k8s/apis/apiextensions/v1beta1"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 )
@@ -17,6 +20,7 @@ import (
 type Operator struct {
 	client         Client
 	resourceType   reflect.Type
+	crd            *apiextensionsv1beta1.CustomResourceDefinition
 	logger         log.Logger
 	reconciler     Reconciler
 	store          store
@@ -75,6 +79,14 @@ func WithReconciler(r Reconciler) Option {
 	}
 }
 
+// WithReconciler configures the operator to create the specified
+// Custom Resource Definition when the operator starts and it does not exist yet.
+func WithCRD(crd *apiextensionsv1beta1.CustomResourceDefinition) Option {
+	return func(op *Operator) {
+		op.crd = crd
+	}
+}
+
 // New constructs a new operator with the provided options.
 func New(options ...Option) *Operator {
 	op := &Operator{
@@ -106,6 +118,8 @@ func (op *Operator) makeResource() k8s.Resource {
 }
 
 func (op *Operator) Run() {
+	op.reconcileCRD()
+
 	var wg sync.WaitGroup
 
 	wg.Add(1)
@@ -319,4 +333,25 @@ func (op *Operator) Reconcile() {
 			"msg", "triggered update for all resources",
 		)
 	}()
+}
+
+func (op *Operator) reconcileCRD() {
+	if op.crd == nil {
+		level.Debug(op.logger).Log("msg", "no CRD to reconcile")
+		return
+	}
+
+	err := op.client.Create(context.Background(), op.crd)
+	if err == nil {
+		level.Info(op.logger).Log("msg", "CRD reconciled")
+		return
+	}
+
+	var apiErr *k8s.APIError
+	if errors.As(err, &apiErr) && apiErr.Code == http.StatusConflict {
+		level.Debug(op.logger).Log("msg", "CRD does already exist")
+		return
+	}
+
+	level.Info(op.logger).Log("msg", "failed to reconcile CRD", "err", err)
 }
