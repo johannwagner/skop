@@ -11,7 +11,7 @@ import (
 
 type Client interface {
 	Create(ctx context.Context, res k8s.Resource, options ...k8s.Option) error
-	Get(ctx context.Context, name string, res k8s.Resource, options ...k8s.Option) error
+	Get(ctx context.Context, namespace string, name string, res k8s.Resource, options ...k8s.Option) error
 	Update(ctx context.Context, res k8s.Resource, options ...k8s.Option) error
 	Delete(ctx context.Context, res k8s.Resource, options ...k8s.Option) error
 	Watch(ctx context.Context, res k8s.Resource) (Watcher, error)
@@ -31,8 +31,8 @@ func (a k8sClientAdapter) Create(ctx context.Context, res k8s.Resource, options 
 	return a.c.Create(ctx, res, options...)
 }
 
-func (a k8sClientAdapter) Get(ctx context.Context, name string, res k8s.Resource, options ...k8s.Option) error {
-	return a.c.Get(ctx, a.c.Namespace, name, res, options...)
+func (a k8sClientAdapter) Get(ctx context.Context, namespace string, name string, res k8s.Resource, options ...k8s.Option) error {
+	return a.c.Get(ctx, namespace, name, res, options...)
 }
 
 func (a k8sClientAdapter) Update(ctx context.Context, res k8s.Resource, options ...k8s.Option) error {
