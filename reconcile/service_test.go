@@ -52,7 +52,7 @@ func TestServiceExisting(t *testing.T) {
 	client.
 		EXPECT().
 		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
-		Do(func(_ context.Context, _ string, res k8s.Resource) {
+		Do(func(_ context.Context, _, _ string, res k8s.Resource) {
 			*res.(*corev1.Service) = *existingService
 		}).
 		Return(nil)

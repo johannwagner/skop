@@ -51,7 +51,7 @@ func TestDeploymentExisting(t *testing.T) {
 	client.
 		EXPECT().
 		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
-		Do(func(_ context.Context, _ string, res k8s.Resource) {
+		Do(func(_ context.Context, _, _ string, res k8s.Resource) {
 			*res.(*appsv1.Deployment) = *existingDeployment
 		}).
 		Return(nil)
