@@ -8,7 +8,7 @@ require (
 	github.com/go-kit/kit v0.9.0
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/golang/mock v1.3.1
+	github.com/golang/mock v1.4.0
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/mattn/go-isatty v0.0.9
 	golang.org/x/net v0.0.0-20191028085509-fe3aa8a45271 // indirect

@@ -55,9 +55,9 @@ func (mr *ClientMockRecorder) Create(ctx, res interface{}, options ...interface{
 }
 
 // Get mocks base method
-func (m *Client) Get(ctx context.Context, name string, res k8s.Resource, options ...k8s.Option) error {
+func (m *Client) Get(ctx context.Context, namespace, name string, res k8s.Resource, options ...k8s.Option) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, name, res}
+	varargs := []interface{}{ctx, namespace, name, res}
 	for _, a := range options {
 		varargs = append(varargs, a)
 	}
@@ -67,9 +67,9 @@ func (m *Client) Get(ctx context.Context, name string, res k8s.Resource, options
 }
 
 // Get indicates an expected call of Get
-func (mr *ClientMockRecorder) Get(ctx, name, res interface{}, options ...interface{}) *gomock.Call {
+func (mr *ClientMockRecorder) Get(ctx, namespace, name, res interface{}, options ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, name, res}, options...)
+	varargs := append([]interface{}{ctx, namespace, name, res}, options...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*Client)(nil).Get), varargs...)
 }
 
