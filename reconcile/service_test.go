@@ -51,8 +51,8 @@ func TestServiceExisting(t *testing.T) {
 
 	client.
 		EXPECT().
-		Get(gomock.Eq(ctx), gomock.Eq("test"), gomock.Any()).
-		Do(func(_ context.Context, _ string, res k8s.Resource) {
+		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
+		Do(func(_ context.Context, _, _ string, res k8s.Resource) {
 			*res.(*corev1.Service) = *existingService
 		}).
 		Return(nil)
@@ -103,7 +103,7 @@ func TestServiceNotFound(t *testing.T) {
 
 	client.
 		EXPECT().
-		Get(gomock.Eq(ctx), gomock.Eq("test"), gomock.Any()).
+		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
 		Return(&k8s.APIError{Code: http.StatusNotFound})
 
 	client.
@@ -137,7 +137,7 @@ func TestServiceGetError(t *testing.T) {
 
 	client.
 		EXPECT().
-		Get(gomock.Eq(ctx), gomock.Eq("test"), gomock.Any()).
+		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
 		Return(&k8s.APIError{Code: http.StatusInternalServerError})
 
 	if err := Service(ctx, client, service); err == nil {
@@ -166,7 +166,7 @@ func TestServiceCreateError(t *testing.T) {
 
 	client.
 		EXPECT().
-		Get(gomock.Eq(ctx), gomock.Eq("test"), gomock.Any()).
+		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
 		Return(&k8s.APIError{Code: http.StatusNotFound})
 
 	client.

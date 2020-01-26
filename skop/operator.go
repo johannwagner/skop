@@ -15,16 +15,17 @@ import (
 )
 
 type Operator struct {
-	client         Client
-	resourceType   reflect.Type
-	logger         log.Logger
-	reconciler     Reconciler
-	store          store
-	updates        chan k8s.Resource
-	retries        chan string
-	retrySchedules map[string]retrySchedule
-	stop           chan struct{}
-	stopOnce       sync.Once
+	client             Client
+	resourceType       reflect.Type
+	logger             log.Logger
+	reconciler         Reconciler
+	store              store
+	updates            chan k8s.Resource
+	retries            chan string
+	retrySchedules     map[string]retrySchedule
+	stop               chan struct{}
+	stopOnce           sync.Once
+	watchAllNamespaces bool
 }
 
 type retrySchedule struct {
@@ -33,6 +34,18 @@ type retrySchedule struct {
 }
 
 type Option func(op *Operator)
+
+type WatchOptions struct {
+	watchAllNamespaces bool
+}
+
+// WithWatchOptions configures the resource watch of an operator.
+// This option is optional.
+func WithWatchOptions(watchOptions WatchOptions) Option {
+	return func(op *Operator) {
+		op.watchAllNamespaces = watchOptions.watchAllNamespaces
+	}
+}
 
 // WithResource configures an operator to watch for changes of the specified
 // resource type. This option is required and New will panic if it is not provided.
@@ -78,10 +91,11 @@ func WithReconciler(r Reconciler) Option {
 // New constructs a new operator with the provided options.
 func New(options ...Option) *Operator {
 	op := &Operator{
-		updates:        make(chan k8s.Resource),
-		retries:        make(chan string),
-		stop:           make(chan struct{}),
-		retrySchedules: make(map[string]retrySchedule),
+		updates:            make(chan k8s.Resource),
+		retries:            make(chan string),
+		stop:               make(chan struct{}),
+		retrySchedules:     make(map[string]retrySchedule),
+		watchAllNamespaces: false,
 	}
 	for _, option := range options {
 		option(op)
@@ -145,7 +159,7 @@ func (op *Operator) watch() {
 			level.Info(op.logger).Log(
 				"msg", "starting to watch for changes",
 			)
-			watcher, err := op.client.Watch(watchCtx, res)
+			watcher, err := op.client.Watch(watchCtx, res, op.watchAllNamespaces)
 			if err != nil {
 				watchErr <- err
 				return

@@ -60,8 +60,8 @@ func TestOperator(t *testing.T) {
 
 	client.
 		EXPECT().
-		Watch(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(ctx context.Context, res k8s.Resource) (skop.Watcher, error) {
+		Watch(gomock.Any(), gomock.Any(), gomock.Any()).
+		DoAndReturn(func(ctx context.Context, res k8s.Resource, watchAllNamespaces bool) (skop.Watcher, error) {
 			return watcher, nil
 		}).
 		AnyTimes()
