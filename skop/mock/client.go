@@ -112,18 +112,18 @@ func (mr *ClientMockRecorder) Delete(ctx, res interface{}, options ...interface{
 }
 
 // Watch mocks base method
-func (m *Client) Watch(ctx context.Context, res k8s.Resource) (skop.Watcher, error) {
+func (m *Client) Watch(ctx context.Context, res k8s.Resource, watchAllNamespaces bool) (skop.Watcher, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Watch", ctx, res)
+	ret := m.ctrl.Call(m, "Watch", ctx, res, watchAllNamespaces)
 	ret0, _ := ret[0].(skop.Watcher)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Watch indicates an expected call of Watch
-func (mr *ClientMockRecorder) Watch(ctx, res interface{}) *gomock.Call {
+func (mr *ClientMockRecorder) Watch(ctx, res, watchAllNamespaces interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Watch", reflect.TypeOf((*Client)(nil).Watch), ctx, res)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Watch", reflect.TypeOf((*Client)(nil).Watch), ctx, res, watchAllNamespaces)
 }
 
 // Watcher is a mock of Watcher interface
