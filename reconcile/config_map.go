@@ -2,7 +2,8 @@ package reconcile
 
 import (
 	"context"
-	"net/http"
+	"errors"
+	"fmt"
 
 	"github.com/ericchiang/k8s"
 	corev1 "github.com/ericchiang/k8s/apis/core/v1"
@@ -11,24 +12,22 @@ import (
 )
 
 func ConfigMap(ctx context.Context, client skop.Client, configMap *corev1.ConfigMap) error {
-	existing := new(corev1.ConfigMap)
-	err := client.Get(
-		ctx,
-		configMap.GetMetadata().GetNamespace(),
-		configMap.GetMetadata().GetName(),
-		existing,
-	)
-	if err != nil {
-		if apiErr, ok := err.(*k8s.APIError); ok {
-			if apiErr.Code == http.StatusNotFound {
-				return client.Create(ctx, configMap)
-			}
+	return EnsureResource(ctx, client, configMap, func(existingResource k8s.Resource) error {
+
+		fmt.Printf("EnsureResource called, existingResource: %v\n", existingResource)
+
+		existingConfigMap, isOk := existingResource.(*corev1.ConfigMap)
+
+		if !isOk {
+			fmt.Printf("Invalid cast from existingResource\n")
+			return errors.New("Invalid cast from existing resource")
 		}
-		return err
-	}
-	existing.Metadata.Labels = configMap.Metadata.Labels
-	existing.Metadata.Annotations = configMap.Metadata.Annotations
-	existing.Data = configMap.Data
-	existing.BinaryData = configMap.BinaryData
-	return client.Update(ctx, existing)
+
+		existingConfigMap.Metadata.Labels = configMap.Metadata.Labels
+		existingConfigMap.Metadata.Annotations = configMap.Metadata.Annotations
+		existingConfigMap.Data = configMap.Data
+		existingConfigMap.BinaryData = configMap.BinaryData
+
+		return nil
+	})
 }

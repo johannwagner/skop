@@ -36,6 +36,8 @@ func TestConfigMapExisting(t *testing.T) {
 			Data:       map[string]string{"foo": "baz"},
 			BinaryData: map[string][]byte{"foo": []byte("baz")},
 		}
+
+		/**
 		existingConfigMap = &corev1.ConfigMap{
 			Metadata: &metav1.ObjectMeta{
 				Name:      k8s.String("test"),
@@ -44,14 +46,12 @@ func TestConfigMapExisting(t *testing.T) {
 			Data:       map[string]string{"foo": "bar"},
 			BinaryData: map[string][]byte{"foo": []byte("bar")},
 		}
+		*/
 	)
 
 	client.
 		EXPECT().
-		Get(gomock.Eq(ctx), gomock.Eq("test"), gomock.Any()).
-		Do(func(_ context.Context, _ string, res k8s.Resource) {
-			*res.(*corev1.ConfigMap) = *existingConfigMap
-		}).
+		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
 		Return(nil)
 
 	client.
@@ -77,6 +77,7 @@ func TestConfigMapExisting(t *testing.T) {
 	if err := ConfigMap(ctx, client, configMap); err != nil {
 		t.Fatal(err)
 	}
+
 }
 
 func TestConfigMapNotFound(t *testing.T) {
@@ -99,7 +100,7 @@ func TestConfigMapNotFound(t *testing.T) {
 
 	client.
 		EXPECT().
-		Get(gomock.Eq(ctx), gomock.Eq("test"), gomock.Any()).
+		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
 		Return(&k8s.APIError{Code: http.StatusNotFound})
 
 	client.
@@ -132,7 +133,7 @@ func TestConfigMapError(t *testing.T) {
 
 	client.
 		EXPECT().
-		Get(gomock.Eq(ctx), gomock.Eq("test"), gomock.Any()).
+		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
 		Return(&k8s.APIError{Code: http.StatusInternalServerError})
 
 	if err := ConfigMap(ctx, client, configMap); err == nil {

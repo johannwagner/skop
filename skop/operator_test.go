@@ -68,7 +68,7 @@ func TestOperator(t *testing.T) {
 
 	op := skop.New(
 		skop.WithResource(&testResource{}),
-		skop.WithClient(client),
+		skop.WithClient(client, false),
 		skop.WithReconciler(skop.ReconcilerFunc(reconciler)),
 	)
 

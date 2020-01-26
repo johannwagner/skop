@@ -37,6 +37,8 @@ func TestDeploymentExisting(t *testing.T) {
 				Replicas: k8s.Int32(2),
 			},
 		}
+
+		/**
 		existingDeployment = &appsv1.Deployment{
 			Metadata: &metav1.ObjectMeta{
 				Name:      k8s.String("test"),
@@ -46,14 +48,12 @@ func TestDeploymentExisting(t *testing.T) {
 				Replicas: k8s.Int32(1),
 			},
 		}
+		*/
 	)
 
 	client.
 		EXPECT().
-		Get(gomock.Eq(ctx), gomock.Eq("test"), gomock.Any()).
-		Do(func(_ context.Context, _ string, res k8s.Resource) {
-			*res.(*appsv1.Deployment) = *existingDeployment
-		}).
+		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
 		Return(nil)
 
 	client.
@@ -99,7 +99,7 @@ func TestDeploymentNotFound(t *testing.T) {
 
 	client.
 		EXPECT().
-		Get(gomock.Eq(ctx), gomock.Eq("test"), gomock.Any()).
+		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
 		Return(&k8s.APIError{Code: http.StatusNotFound})
 
 	client.
@@ -133,7 +133,7 @@ func TestDeploymentError(t *testing.T) {
 
 	client.
 		EXPECT().
-		Get(gomock.Eq(ctx), gomock.Eq("test"), gomock.Any()).
+		Get(gomock.Eq(ctx), gomock.Eq("skop"), gomock.Eq("test"), gomock.Any()).
 		Return(&k8s.APIError{Code: http.StatusInternalServerError})
 
 	if err := Deployment(ctx, client, deployment); err == nil {
