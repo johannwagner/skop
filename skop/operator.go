@@ -36,14 +36,14 @@ type retrySchedule struct {
 type Option func(op *Operator)
 
 type WatchOptions struct {
-	watchAllNamespaces bool
+	WatchAllNamespaces bool
 }
 
 // WithWatchOptions configures the resource watch of an operator.
 // This option is optional.
 func WithWatchOptions(watchOptions WatchOptions) Option {
 	return func(op *Operator) {
-		op.watchAllNamespaces = watchOptions.watchAllNamespaces
+		op.watchAllNamespaces = watchOptions.WatchAllNamespaces
 	}
 }
 
